@@ -1,0 +1,4 @@
+solution/
+.DS_Store
+local_data/
+data/*.csv
