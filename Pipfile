@@ -13,6 +13,8 @@ uszipcode = "==0.2.6"
 pyarrow = "*"
 fastparquet = "*"
 dython = "*"
+gensim = "*"
+scikit-learn = "*"
 
 [dev-packages]
 
