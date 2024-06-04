@@ -12,6 +12,7 @@ ipykernel = "*"
 uszipcode = "==0.2.6"
 pyarrow = "*"
 fastparquet = "*"
+dython = "*"
 
 [dev-packages]
 

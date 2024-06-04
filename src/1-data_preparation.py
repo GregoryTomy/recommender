@@ -4,14 +4,13 @@ from datetime import datetime
 from uszipcode import SearchEngine
 
 # %%
-MOVIES_DATA_URL = "data/movies.csv"
-USERS_DATA_URL = "data/users.csv"
-RATINGS_DATA_URL = "data/ratings.csv"
+MOVIES_DATA_URL = "../data/movies.csv"
+USERS_DATA_URL = "../data/users.csv"
+RATINGS_DATA_URL = "../data/ratings.csv"
 
 movies_df = pd.read_csv(MOVIES_DATA_URL, encoding="latin-1")
 users_df = pd.read_csv(USERS_DATA_URL, encoding="latin-1")
 ratings_df = pd.read_csv(RATINGS_DATA_URL, encoding="latin-1")
-
 # %% movies.csv cleanup
 print(movies_df.isna().any())
 movies_df[["title", "movie_year", "genres"]] = movies_df.apply(
@@ -20,7 +19,7 @@ movies_df[["title", "movie_year", "genres"]] = movies_df.apply(
             "title": row["title"][:-7],
             "movie_year": int(row["title"][-5:-1]),
             "genres": (
-                str(row["genres"].split("|"))
+                str(row["genres"]).split("|")
                 if not pd.isnull(row["genres"])
                 else list()
             ),
@@ -71,10 +70,10 @@ print(users_df)
 # convert timestamp from epoch to date columns + time
 # %%
 ratings_df.columns = "user_id movie_id rating timestamp".split()
-timestamp = pd.to_datetime(ratings_df["timestamp"])
-ratings_df["user_month"] = timestamp.dt.month
-ratings_df["user_day"] = timestamp.dt.dayofweek
-ratings_df["user_hour"] = timestamp.dt.hour
+timestamp = pd.to_datetime(ratings_df["timestamp"], unit="s")
+ratings_df["ratings_month"] = timestamp.dt.month
+ratings_df["ratings_day"] = timestamp.dt.dayofweek
+ratings_df["ratings_hour"] = timestamp.dt.hour
 
 print(ratings_df)
 
@@ -99,5 +98,4 @@ full_df["user_city user_state".split()] = full_df[
 print(pd.isna(full_df).any())
 
 # %%
-full_df.to_parquet("local_data/full_data.parquet")
-# %%
+full_df.to_parquet("../local_data/full_data.parquet")
