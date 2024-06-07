@@ -1,4 +1,4 @@
 solution/
 .DS_Store
-local_data/
+local_data/*.csv
 data/*.csv
