@@ -23,4 +23,11 @@ We choose method 2. Here, the model learns from old data and is tested on new da
 Genres were processing using multi-hot vector encoding,  creating one column in the dataset for each dimension of the vector.
 
 
+### Processing Titles
 
+## TensorFlow Recommenders
+
+### Setting a baseline
+First we calculate the baselines that we'll use to compare our predictions to. We will use root mean squared error (RMSE) metic to measure model performance.
+
+The lowest RMSE we reached without traininga model was 1.25.
