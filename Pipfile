@@ -16,6 +16,8 @@ dython = "*"
 gensim = "*"
 scikit-learn = "*"
 scipy = "==1.12"
+tensorflow-recommenders = "*"
+pydot = "*"
 
 [dev-packages]
 

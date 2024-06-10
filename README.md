@@ -31,3 +31,9 @@ Genres were processing using multi-hot vector encoding,  creating one column in 
 First we calculate the baselines that we'll use to compare our predictions to. We will use root mean squared error (RMSE) metic to measure model performance.
 
 The lowest RMSE we reached without traininga model was 1.25.
+
+### Two-tower approach.
+
+The two-tower model consists of two separate neural networks (towers), one for encoding user features and the other for encoding item features. The key idea is to learn compact representations (embeddings) for both users and items in such a way that similar users and items have similar embeddings.
+
+![](images/two-tower-arch.jpeg)
