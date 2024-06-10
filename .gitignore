@@ -2,3 +2,4 @@ solution/
 .DS_Store
 local_data/*.csv
 data/*.csv
+__pycahe__/

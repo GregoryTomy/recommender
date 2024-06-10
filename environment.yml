@@ -1,0 +1,20 @@
+name: recc
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas
+  - tensorflow
+  - matplotlib
+  - seaborn
+  - ipykernel
+  - uszipcode=0.2.6
+  - pyarrow
+  - fastparquet
+  - dython
+  - gensim
+  - scikit-learn
+  - scipy=1.12
+  - tensorflow-recommenders
+  - pydot

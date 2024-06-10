@@ -1,9 +1,8 @@
 # %%
-from typing import List
+import json
 import pandas as pd
 import tensorflow as tf
 import tensorflow_recommenders as tfrs
-import json
 
 
 def load_data(
@@ -18,26 +17,10 @@ def load_data(
     return train_data, test_data, metadata
 
 
-TRAIN_PATH = "local_data/train_data.csv"
-TEST_PATH = "local_data/test_data.csv"
-METADATA_PATH = "local_data/metadata.json"
-
-train_df, test_df, metadata = load_data(TRAIN_PATH, TEST_PATH, METADATA_PATH)
-
-train_df = train_df.sample(10000)
-
-
 # %%
 def convert_to_tensorflow_df(data: pd.DataFrame) -> tf.data.Dataset:
     data_dict = {column: data[column].values for column in data.columns}
     return tf.data.Dataset.from_tensor_slices(data_dict)
-
-
-user_vocab = [str(i) for i in metadata.get("user_id")]
-movie_vocab = [str(i) for i in metadata.get("movie_id")]
-
-train_df = convert_to_tensorflow_df(train_df)
-test_df = convert_to_tensorflow_df(test_df)
 
 
 # %%
@@ -45,7 +28,7 @@ class RatingPredictionModel(tfrs.models.Model):
     def __init__(self):
         super().__init__()
 
-        # User tower
+        # user tower
         self.user_input = tf.keras.Input(shape=(1,), dtype=tf.string, name="user_input")
         self.user_sl = tf.keras.layers.StringLookup(
             vocabulary=user_vocab, name="user_string_lookup"
@@ -58,7 +41,7 @@ class RatingPredictionModel(tfrs.models.Model):
             20, activation="relu", name="user_dense"
         )(self.user_emb)
 
-        # Movie tower
+        # movie tower
         self.movie_input = tf.keras.Input(
             shape=(1,), dtype=tf.string, name="movie_input"
         )
@@ -84,7 +67,7 @@ class RatingPredictionModel(tfrs.models.Model):
             self.towers_dense
         )
 
-        # Model definition
+        # model definition
         self.model = tf.keras.Model(
             inputs={"user": self.user_input, "movie": self.movie_input},
             outputs=self.output_node,
@@ -107,16 +90,38 @@ class RatingPredictionModel(tfrs.models.Model):
         return self.task(labels=features["rating"], predictions=self(features))
 
 
-# %%
-model = RatingPredictionModel()
-learning_rate = 2e-3
-model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate))
-# cached_train = train_df.shuffle(150).batch(100).cache()
-# early_stopping = tf.keras.callbacks.EarlyStopping(
-#     monitor="loss", restore_best_weights=True, patience=5
-# )
+if __name__ == "__main__":
+    TRAIN_PATH = "local_data/train_data.csv"
+    TEST_PATH = "local_data/test_data.csv"
+    METADATA_PATH = "local_data/metadata.json"
 
-# model.fit(cached_train, epochs=10, callbacks=[early_stopping])
-# %%
-tf.keras.utils.plot_model(model.model, to_file="project_2_2.png")
-# %%
+    train_df, test_df, metadata = load_data(TRAIN_PATH, TEST_PATH, METADATA_PATH)
+
+    user_vocab = [str(i) for i in metadata.get("user_id")]
+    movie_vocab = [str(i) for i in metadata.get("movie_id")]
+
+    train_df = convert_to_tensorflow_df(train_df)
+    test_df = convert_to_tensorflow_df(test_df)
+
+    # instantiate the model
+    model = RatingPredictionModel()
+    LEARNING_RATE= 2e-3
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE))
+
+    # train the model
+    cached_train = train_df.shuffle(15000).batch(10000).cache()
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+        monitor="loss", restore_best_weights=True, patience=5
+    )
+
+    model.fit(cached_train, epochs=10, callbacks=[early_stopping])
+
+    # test the model
+    cached_test = test_df.batch(5000).cache()
+    model.evaluate(cached_test, return_dict=True)
+
+    tf.keras.utils.plot_model(model.model, to_file="images/two_tower_simple.png")
+
+    print(model.model.summary())
+
+    model.save_weights("models/weights_simple")
